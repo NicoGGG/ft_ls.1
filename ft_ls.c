@@ -26,7 +26,12 @@ char	**to_display(t_flag *option, char **names)
 	i = 0;
 	while (names[i])
 	{
-		if (*names[i] != '.')
+		if (option->a == 0)
+		{
+			if (*names[i] != '.')
+				new[j++] = strdup(names[i]);
+		}
+		else
 			new[j++] = strdup(names[i]);
 		free(names[i]);
 		i++;
@@ -35,7 +40,7 @@ char	**to_display(t_flag *option, char **names)
 	return (new);
 }
 
-char	**in_folder(int count, char *av)
+char	**in_folder(int count, char *curr_dir)
 {
 	char			**names;
 	void			*dirp;
@@ -44,31 +49,39 @@ char	**in_folder(int count, char *av)
 
 	j = 0;
 	names = malloc(sizeof(char *) * count + 1);
-	dirp = opendir(av);
+	dirp = opendir(curr_dir);
 	while ((dp = readdir(dirp)))
 		names[j++] = strdup(dp->d_name);
 	names[j] = NULL;
 	return (names);
 }
 
-void	ft_ls(char **av, t_flag *option)
+int		ft_ls(char **av, t_flag *option, t_long *long_struct)
 {
 	char			**names;
 	void			*dirp;
 	struct dirent	*dp;
 	int				count;
-	
-	if (*av == NULL)
-		return ;
-	if (*(av + 1))
-		printf("%s:\n", *av);
+	char			*curr_dir;
+
+	if (*av == NULL && option->args > 0)
+		return (1);
+	else if (option->args == 0)
+		return (ls_noargs(option, "."));
 	count = 0;
-	while (*av && **av == '-')
-		av++;
-	dirp = opendir(*av);
+	if (option->args > 1)
+	{
+		printf("%s:\n", *av);
+		curr_dir = *av;
+	}
+	else if (option->args == 1)
+		curr_dir = *av;
+	else
+		curr_dir = strdup(".");
+/*	dirp = opendir(curr_dir);
 	while ((dp = readdir(dirp)))
 		count++;
-	names = in_folder(count, *av);
+	names = in_folder(count, curr_dir);
 	names = to_display(option, names);
 //	sort_names(option, names);
 	while (*names)
@@ -76,5 +89,9 @@ void	ft_ls(char **av, t_flag *option)
 		print_dir(*names);
 		names++;
 	}
-	ft_ls(av + 1, option);
+*/
+	option_ls(option, curr_dir, long_struct);
+	if (*(av + 1))
+		printf("\n");
+	return (ft_ls(av + 1, option, long_struct));
 }

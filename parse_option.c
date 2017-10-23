@@ -16,7 +16,6 @@ void	parse_option(char **av, t_flag *option)
 {
 	int j;
 
-	j = 0;
 	while (*av && (*av)[0] == '-')
 	{
 		j = 0;
@@ -40,4 +39,12 @@ void	parse_option(char **av, t_flag *option)
 		}
 		av++;
 	}
+}
+
+void	parse_args(char **av, t_flag *option)
+{
+	while (*av && (*av)[0] == '-')
+		av++;
+	while (*av++)
+		option->args += 1;
 }
